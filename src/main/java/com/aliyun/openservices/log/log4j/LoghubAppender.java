@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.spi.ThrowableInformation;
 
@@ -34,6 +35,16 @@ public class LoghubAppender extends AppenderSkeleton {
         formatter.setTimeZone(TimeZone.getTimeZone(timeZone));
         producer = new LogProducer(config);
         producer.setProjectConfig(projectConfig);
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                try {
+                    doClose();
+                } catch (Exception e) {
+                    LogLog.error("Failed to close LoghubAppender.", e);
+                }
+            }
+        });
     }
 
     public String getTimeFormat() {
@@ -47,7 +58,16 @@ public class LoghubAppender extends AppenderSkeleton {
     }
 
     public void close() {
+        try {
+            doClose();
+        } catch (Exception e) {
+            LogLog.error("Failed to close LoghubAppender.", e);
+        }
+    }
+
+    private void doClose() throws InterruptedException {
         producer.flush();
+        Thread.sleep(2 * config.packageTimeoutInMS);
         producer.close();
     }
 
@@ -108,8 +128,8 @@ public class LoghubAppender extends AppenderSkeleton {
                         .toString());
             }
         }
-        producer.send(projectConfig.projectName, logstore, topic, null,
-                logItems);
+        producer.send(projectConfig.projectName, logstore, topic, null, logItems,
+                new LoghubAppenderCallback(projectConfig.projectName, logstore, topic, null, logItems));
     }
 
     public String getProjectName() {

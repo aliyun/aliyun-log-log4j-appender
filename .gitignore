@@ -28,3 +28,4 @@ hs_err_pid*
 target/
 
 # Local test files
+log4j-wubo.properties
