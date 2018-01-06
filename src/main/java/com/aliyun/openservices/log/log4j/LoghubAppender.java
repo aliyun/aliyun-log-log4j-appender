@@ -204,12 +204,12 @@ public class LoghubAppender extends AppenderSkeleton {
         config.memPoolSizeInByte = memPoolSizeInByte;
     }
 
-    public int getIoThreadsCount() {
+    public int getMaxIOThreadSizeInPool() {
         return config.maxIOThreadSizeInPool;
     }
 
-    public void setIoThreadsCount(int ioThreadsCount) {
-        config.maxIOThreadSizeInPool = ioThreadsCount;
+    public void setMaxIOThreadSizeInPool(int maxIOThreadSizeInPool) {
+        config.maxIOThreadSizeInPool = maxIOThreadSizeInPool;
     }
 
     public int getShardHashUpdateIntervalInMS() {
