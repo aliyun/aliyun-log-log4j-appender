@@ -212,14 +212,6 @@ public class LoghubAppender extends AppenderSkeleton {
         config.maxIOThreadSizeInPool = maxIOThreadSizeInPool;
     }
 
-    public int getShardHashUpdateIntervalInMS() {
-        return config.shardHashUpdateIntervalInMS;
-    }
-
-    public void setShardHashUpdateIntervalInMS(int shardHashUpdateIntervalInMS) {
-        config.shardHashUpdateIntervalInMS = shardHashUpdateIntervalInMS;
-    }
-
     public int getRetryTimes() {
         return config.retryTimes;
     }
