@@ -41,11 +41,11 @@ time:2016-05-27T03:15+0000
 </dependency>
 <dependency>
      <groupId>com.aliyun.openservices</groupId>
-     <artifactId>log-loghub-log4j2-appender</artifactId>
-     <version>0.1.0</version>
+     <artifactId>aliyun-log-log4j-appender</artifactId>
+     <version>0.1.3</version>
 </dependency>
 ```
-2. 修改配置文件：以配置文件`log4j2.properties`为例（不存在则在项目根目录创建），配置Loghub相关的appender与 Logger，例如：
+2. 修改配置文件：以配置文件`log4j.properties`为例（不存在则在项目根目录创建），配置Loghub相关的appender与 Logger，例如：
 ```
 log4j.rootLogger=WARN,loghub
 log4j.appender.loghub=com.aliyun.openservices.log.log4j.LoghubAppender
