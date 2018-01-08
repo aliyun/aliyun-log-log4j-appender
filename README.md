@@ -38,7 +38,7 @@ time: 2018-01-02T03:15+0000
 
 ```
 <dependency>
-	<groupId>com.google.protobuf</groupId>
+    <groupId>com.google.protobuf</groupId>
     <artifactId>protobuf-java</artifactId>
     <version>2.5.0</version>
 </dependency>
