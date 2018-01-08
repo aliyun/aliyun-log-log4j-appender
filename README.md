@@ -66,8 +66,6 @@ log4j.appender.loghub.endpoint=[your project endpoint]
 #用户身份标识，必选参数
 log4j.appender.loghub.accessKeyId=[your accesskey id]
 log4j.appender.loghub.accessKey=[your accesskey]
-#当使用临时身份时必须填写，非临时身份则不需要填写
-log4j.appender.loghub.stsToken=[your ststoken]
 
 #被缓存起来的日志的发送超时时间，如果缓存超时，则会被立即发送，单位是毫秒，默认值为3000，最小值为10，可选参数
 log4j.appender.loghub.packageTimeoutInMS=3000
