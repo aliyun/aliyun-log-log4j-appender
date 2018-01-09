@@ -30,3 +30,6 @@ target/
 # Local test files
 log4j-wubo.properties
 log4j-test-wubo.properties
+
+# macos
+.DS_Store
