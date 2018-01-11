@@ -135,13 +135,29 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.9</version>
 				<configuration>
-					<argLine>-Xmx1024m -XX:PermSize=256m -XX:MaxPermSize=256m
-						-Dfile.encoding=UTF-8</argLine>
-					<excludes>
-						<exclude>**/odps/**</exclude>
-						<exclude>**/oms/**</exclude>
-					</excludes>
 					<forkMode>once</forkMode>
+					<systemProperties>
+						<property>
+							<name>endpoint</name>
+							<value>${env.endpoint}</value>
+						</property>
+						<property>
+							<name>accessKeyId</name>
+							<value>${env.accessKeyId}</value>
+						</property>
+						<property>
+							<name>accessKey</name>
+							<value>${env.accessKey}</value>
+						</property>
+						<property>
+							<name>projectName</name>
+							<value>${env.projectName}</value>
+						</property>
+						<property>
+							<name>logstore</name>
+							<value>${env.logstore}</value>
+						</property>
+					</systemProperties>
 				</configuration>
 			</plugin>
 
