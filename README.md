@@ -115,7 +115,7 @@ logsBytesPerPackage = 5242880
 memPoolSizeInByte = 1048576000
 #指定I/O线程池最大线程数量，主要用于发送数据到日志服务，默认是8，可选参数
 maxIOThreadSizeInPool = 8
-#指定发送失败时重试的次数，如果超过该值，会把失败信息记录到log4j的StatusLogger里，默认是3，可选参数
+#指定发送失败时重试的次数，如果超过该值，会把失败信息通过log4j的LogLog进行输出，默认是3，可选参数
 retryTimes = 3
 
 #指定日志主题
