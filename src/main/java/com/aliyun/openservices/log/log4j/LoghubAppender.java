@@ -67,7 +67,6 @@ public class LoghubAppender extends AppenderSkeleton {
 
     private void doClose() throws InterruptedException {
         producer.flush();
-        Thread.sleep(2 * config.packageTimeoutInMS);
         producer.close();
     }
 
