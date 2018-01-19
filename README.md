@@ -29,7 +29,7 @@ time: 2018-01-02T03:15+0000
 + 上下文查询：服务端除了通过关键词检索外，给定日志能够精确还原原始日志文件上下文日志信息。
 
 ## 版本支持
-* log-loghub-producer 0.1.8
+* log-loghub-producer 0.1.10
 * protobuf-java 2.5.0
 
 
@@ -46,7 +46,7 @@ time: 2018-01-02T03:15+0000
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log-log4j-appender</artifactId>
-    <version>0.1.4</version>
+    <version>0.1.5</version>
 </dependency>
 ```
 
