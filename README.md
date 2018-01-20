@@ -140,3 +140,8 @@ timeZone  UTC
 [Log4jAppenderExample.java](/src/main/java/com/aliyun/openservices/log/log4j/example/Log4jAppenderExample.java)
 
 [log4j.properties](/src/main/resources/log4j.properties)
+
+## 贡献者
+[@zzboy](https://github.com/zzboy) 对项目作了很大贡献。
+
+感谢 [@zzboy](https://github.com/zzboy) 的杰出工作。
