@@ -4,7 +4,7 @@
 
 [中文版README](/README_CN.md)
 
-## Aliyun Log Log4j2 Appender
+## Aliyun Log Log4j Appender
 
 Apache log4j is an Apache Software Foundation Project. You can control the destination of the log through Log4j. It can be console, file, GUI components, socket, NT event log, syslog. You can control the output format for each log as well. You can control the generation process of the log through log level. The most interesting thing is you can complete the above things through a configuration file and without any code modification.
 
@@ -26,7 +26,7 @@ Field Specifications:
 
 ## Advantage
 + `Disk Free`: the generation data will be send to AliCloud Log Service in real time through network.
-+ `Without Refactor`: if your application already use Log4j2, you can just add Log4j2 appender to your configuration file.
++ `Without Refactor`: if your application already use Log4j, you can just add Log4j appender to your configuration file.
 + `Asynchronous and High Throughput`: the data will be send to AliCloud Log Service asynchronously. It is suitable for high concurrent write.
 + `Context Query`: at server side, in addition to searching log with keywords, you can obtain the context information of original log as well.
 
