@@ -90,7 +90,7 @@ log4j.appender.loghub.topic = [your topic]
 log4j.appender.loghub.timeFormat=yyyy-MM-dd'T'HH:mmZ
 log4j.appender.loghub.timeZone=UTC
 ```
-参阅：https://help.aliyun.com/document_detail/43758.html
+参阅：https://github.com/aliyun/aliyun-log-producer-java
 
 ## 使用实例
 项目中提供了一个名为`com.aliyun.openservices.log.log4j.Log4jAppenderExample`的实例，它会加载resources目录下的`log4j.properties`文件进行log4j配置。

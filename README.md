@@ -2,12 +2,13 @@
 
 [![Build Status](https://travis-ci.org/aliyun/aliyun-log-log4j-appender.svg?branch=master)](https://travis-ci.org/aliyun/aliyun-log-log4j-appender)
 
-## Aliyun Log Log4j Appender
-Log4j 是 Apache 的一个开放源代码项目，通过使用 Log4j，您可以控制日志信息输送的目的地是控制台、文件、GUI 组件、甚至是套接口服务器、NT 的事件记录器、UNIX Syslog 守护进程等；您也可以控制每一条日志的输出格式；通过定义每一条日志信息的级别，您能够更加细致地控制日志的生成过程。最令人感兴趣的就是，这些可以通过一个配置文件来灵活地进行配置，而不需要修改应用的代码。
+[中文版README](/README_CN.md)
 
-Log4j 由三个重要的组件构成：日志信息的优先级，日志信息的输出目的地，日志信息的输出格式。日志信息的优先级从高到低分别为 ERROR、WARN、INFO和DEBUG，分别用来指定这条日志信息的重要程度；日志信息的输出目的地指定了日志将打印到控制台还是文件中；而输出格式则控制了日志信息的显示内容。
+## Aliyun Log Log4j2 Appender
 
-通过Aliyun Log Log4j Appender，您可以控制日志的输出目的地为阿里云日志服务。需要注意的是，Aliyun Log Log4j Appender不支持设置日志的输出格式，写到日志服务中的日志的样式如下：
+Apache log4j is an Apache Software Foundation Project. You can control the destination of the log through Log4j. It can be console, file, GUI components, socket, NT event log, syslog. You can control the output format for each log as well. You can control the generation process of the log through log level. The most interesting thing is you can complete the above things through a configuration file and without any code modification.
+
+You can set the destination of your log to AliCloud Log Service through `Aliyun Log Log4j Appender`. But it is important to note that `Aliyun Log Log4j Appender` doesn't support cofigure log's output format. The format of the log in AliCloud Log Service is as follows:
 ```
 level: ERROR
 location: com.aliyun.openservices.log.log4j.example.Log4jAppenderExample.main(Log4jAppenderExample.java:16)
@@ -15,27 +16,29 @@ message: error log
 thread: main
 time: 2018-01-02T03:15+0000
 ```
-其中：
-+ level 是日志级别。
-+ location 是日志打印语句的代码位置。
-+ message 是日志内容。
-+ thread 是线程名称。
-+ time 是日志打印时间。
+Field Specifications:
++ `level` stands for log level
++ `location` is logs's output position
++ `message` is the content of the log
++ `thread` stands for thread name
++ `time` is the log's generation time
 
-## 功能优势
-+ 日志不落盘：产生数据实时通过网络发给服务端。
-+ 无需改造：对已使用Log4J应用，只需简单配置即可采集。
-+ 异步高吞吐：高并发设计，后台异步发送，适合高并发写入。
-+ 上下文查询：服务端除了通过关键词检索外，给定日志能够精确还原原始日志文件上下文日志信息。
 
-## 版本支持
+## Advantage
++ `Disk Free`: the generation data will be send to AliCloud Log Service in real time through network.
++ `Without Refactor`: if your application already use Log4j2, you can just add Log4j2 appender to your configuration file.
++ `Asynchronous and High Throughput`: the data will be send to AliCloud Log Service asynchronously. It is suitable for high concurrent write.
++ `Context Query`: at server side, in addition to searching log with keywords, you can obtain the context information of original log as well.
+
+
+## Supported Version
 * log-loghub-producer 0.1.10
 * protobuf-java 2.5.0
 
 
-## 配置步骤
+## Configuration Steps
 
-### 1. maven 工程中引入依赖
+### 1. Adding the Dependencies in pom.xml
 
 ```
 <dependency>
@@ -50,60 +53,53 @@ time: 2018-01-02T03:15+0000
 </dependency>
 ```
 
-### 2. 修改配置文件
+### 2. Modify the Configuration File
 
-以配置文件`log4j.properties`为例（不存在则在项目根目录创建），配置Loghub相关的appender与 Logger，例如：
+Take `log4j.properties` as an example, you can configure the appender and logger related to AliCloud Log Services as follows:
 ```
 log4j.rootLogger=WARN,loghub
 
 log4j.appender.loghub=com.aliyun.openservices.log.log4j.LoghubAppender
 
-#日志服务的project名，必选参数
+# Specify the project name of your log services, required
 log4j.appender.loghub.projectName=[your project]
-#日志服务的logstore名，必选参数
+# Specify the logstore of your log services, required
 log4j.appender.loghub.logstore=[your logstore]
-#日志服务的http地址，必选参数
+# Specify the HTTP endpoint of your log services, required
 log4j.appender.loghub.endpoint=[your project endpoint]
-#用户身份标识，必选参数
+# Specify the account information for your log services, required
 log4j.appender.loghub.accessKeyId=[your accesskey id]
 log4j.appender.loghub.accessKey=[your accesskey]
 
-#被缓存起来的日志的发送超时时间，如果缓存超时，则会被立即发送，单位是毫秒，默认值为3000，最小值为10，可选参数
+# Specify the timeout for sending package, in milliseconds, default is 3000, the lower bound is 10, optional
 log4j.appender.loghub.packageTimeoutInMS=3000
-#每个缓存的日志包中包含日志数量的最大值，不能超过 4096，可选参数
+# Specify the maximum log count per package, the upper limit is 4096, optional
 log4j.appender.loghub.logsCountPerPackage=4096
-#每个缓存的日志包的大小的上限，不能超过 5MB，单位是字节，可选参数
+# Specify the maximum cache size per package, the upper limit is 5MB, in bytes, optional
 log4j.appender.loghub.logsBytesPerPackage=5242880
-#Appender 实例可以使用的内存的上限，单位是字节，默认是 100MB，可选参数
+# The upper limit of the memory that can be used by appender, in bytes, default is 100MB, optional
 log4j.appender.loghub.memPoolSizeInByte=1048576000
-#指定I/O线程池最大线程数量，主要用于发送数据到日志服务，默认是8，可选参数
+# Specify the I/O thread pool's maximum pool size, the main function of the I/O thread pool is to send data, default is 8, optional
+maxIOThreadSizeInPool = 8
 log4j.appender.loghub.maxIOThreadSizeInPool=8
-#指定发送失败时重试的次数，如果超过该值，会把失败信息记录到log4j的StatusLogger里，默认是3，可选参数
+# Specify the retry times when failing to send data, if exceeds this value, the appender will record the failure message to BasicStatusManager, default is 3, optional
 log4j.appender.loghub.retryTimes=3
 
-#指定日志主题
+# Specify the topic of your log
 log4j.appender.loghub.topic = [your topic]
 
-#输出到日志服务的时间格式，使用 Java 中 SimpleDateFormat 格式化时间，默认是 ISO8601，可选参数
+# Specify the time format of the data being sent to AliCloud Log Service, use SimpleDateFormat in Java to format time, default is ISO8601，optional
 log4j.appender.loghub.timeFormat=yyyy-MM-dd'T'HH:mmZ
 log4j.appender.loghub.timeZone=UTC
 ```
-参阅：https://help.aliyun.com/document_detail/43758.html
 
-## 使用实例
-项目中提供了一个名为`com.aliyun.openservices.log.log4j.Log4jAppenderExample`的实例，它会加载resources目录下的`log4j.properties`文件进行log4j配置。
-
-**log4j.properties样例说明**
-+ 配置了三个appender：loghubAppender1、loghubAppender2、STDOUT。
-+ loghubAppender1：将日志输出到project=test-proj，logstore=store1。输出WARN及以上级别的日志。
-+ loghubAppender2：将日志输出到project=test-proj，logstore=store2。输出INFO及以上级别的日志。
-+ STDOUT：将日志输出到控制台。由于没有对日志级别进行过滤，会输出rootLogger中配置的日志级及以上的所有日志。
+## Sample Code
 
 [Log4jAppenderExample.java](/src/main/java/com/aliyun/openservices/log/log4j/example/Log4jAppenderExample.java)
 
 [log4j.properties](/src/main/resources/log4j.properties)
 
-## 贡献者
-[@zzboy](https://github.com/zzboy) 对项目作了很大贡献。
+## Contributors
+[@zzboy](https://github.com/zzboy) made a great contribution to this project.
 
-感谢 [@zzboy](https://github.com/zzboy) 的杰出工作。
+Thanks for the excellent work by [@zzboy](https://github.com/zzboy).
