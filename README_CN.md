@@ -94,6 +94,7 @@ log4j.appender.loghub.timeZone=UTC
 参阅：https://github.com/aliyun/aliyun-log-producer-java
 
 ## 使用实例
+
 项目中提供了一个名为`com.aliyun.openservices.log.log4j.Log4jAppenderExample`的实例，它会加载resources目录下的`log4j.properties`文件进行log4j配置。
 
 **log4j.properties样例说明**
@@ -105,6 +106,12 @@ log4j.appender.loghub.timeZone=UTC
 [Log4jAppenderExample.java](/src/main/java/com/aliyun/openservices/log/log4j/example/Log4jAppenderExample.java)
 
 [log4j.properties](/src/main/resources/log4j.properties)
+
+## 错误诊断
+
+如果您发现数据没有写入日志服务，可通过如下步骤进行错误诊断。
+* 检查您项目中引入的 protobuf-java，aliyun-log-log4j-appender 这两个 jar 包的版本是否和文档中`maven 工程中引入依赖`部分列出的 jar 包版本一致。
+* Aliyun Log Log4j Appender 会将 appender 运行过程中产生的异常通过 `org.apache.log4j.helpers.LogLog` 记录下来，LogLog  在默认情况下会将信息输出到控制台。如果您在使用过程中遇到了问题，请关注下控制台的错误输出。
 
 ## 贡献者
 [@zzboy](https://github.com/zzboy) 对项目作了很大贡献。
