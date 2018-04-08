@@ -76,8 +76,8 @@ log4j.appender.loghub.accessKey=[your accesskey]
 log4j.appender.loghub.packageTimeoutInMS=3000
 # Specify the maximum log count per package, the upper limit is 4096, optional
 log4j.appender.loghub.logsCountPerPackage=4096
-# Specify the maximum cache size per package, the upper limit is 5MB, in bytes, optional
-log4j.appender.loghub.logsBytesPerPackage=5242880
+# Specify the maximum cache size per package, the upper limit is 3MB, in bytes, optional
+log4j.appender.loghub.logsBytesPerPackage=3145728
 # The upper limit of the memory that can be used by appender, in bytes, default is 100MB, optional
 log4j.appender.loghub.memPoolSizeInByte=1048576000
 # Specify the I/O thread pool's maximum pool size, the main function of the I/O thread pool is to send data, default is 8, optional
@@ -98,7 +98,7 @@ log4j.appender.loghub.timeZone=UTC
 
 [Log4jAppenderExample.java](/src/main/java/com/aliyun/openservices/log/log4j/example/Log4jAppenderExample.java)
 
-[log4j.properties](/src/main/resources/log4j.properties)
+[log4j.properties](/src/main/resources/log4j-example.properties)
 
 ## Contributors
 [@zzboy](https://github.com/zzboy) made a great contribution to this project.
