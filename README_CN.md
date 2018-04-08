@@ -49,7 +49,7 @@ time: 2018-01-02T03:15+0000
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log-log4j-appender</artifactId>
-    <version>0.1.5</version>
+    <version>0.1.6</version>
 </dependency>
 ```
 
@@ -112,6 +112,17 @@ log4j.appender.loghub.timeZone=UTC
 如果您发现数据没有写入日志服务，可通过如下步骤进行错误诊断。
 * 检查您项目中引入的 protobuf-java，aliyun-log-log4j-appender 这两个 jar 包的版本是否和文档中`maven 工程中引入依赖`部分列出的 jar 包版本一致。
 * 通过观察控制台的输出来诊断您的问题。Aliyun Log Log4j Appender 会将 appender 运行过程中产生的异常通过 `org.apache.log4j.helpers.LogLog` 记录下来，LogLog 在默认情况下会将信息输出到控制台。
+
+## 常见问题
+
+**Q**: 把日志级别设置成 DEBUG 之后，aliyun-log-log4j-appender 依赖的第三方库 apache httpclient 会输出大量的日志，如何把这部分日志关闭？
+
+**A**: 可以在您的 log4j.properties 文件中添加如下内容
+```
+log4j.logger.org.apache.http=OFF
+log4j.logger.org.apache.http.wire=OFF
+log4j.logger.com.aliyun=OFF
+```
 
 ## 贡献者
 [@zzboy](https://github.com/zzboy) 对项目作了很大贡献。
