@@ -98,7 +98,7 @@ log4j.appender.loghub.timeZone=UTC
 
 [Log4jAppenderExample.java](/src/main/java/com/aliyun/openservices/log/log4j/example/Log4jAppenderExample.java)
 
-[log4j.properties](/src/main/resources/log4j-example.properties)
+[log4j-example.properties](/src/main/resources/log4j-example.properties)
 
 ## Contributors
 [@zzboy](https://github.com/zzboy) made a great contribution to this project.
