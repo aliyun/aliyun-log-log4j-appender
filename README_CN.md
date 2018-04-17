@@ -111,7 +111,7 @@ log4j.appender.loghub.timeZone=UTC
 
 如果您发现数据没有写入日志服务，可通过如下步骤进行错误诊断。
 * 检查您项目中引入的 protobuf-java，aliyun-log-log4j-appender 这两个 jar 包的版本是否和文档中`maven 工程中引入依赖`部分列出的 jar 包版本一致。
-* 通过观察控制台的输出来诊断您的问题。Aliyun Log Log4j Appender 会将 appender 运行过程中产生的异常通过 `org.apache.log4j.helpers.LogLog` 记录下来，LogLog 在默认情况下会将信息输出到控制台。查看控制台是否输出 Failed to putLogs。
+* 通过观察控制台的输出来诊断您的问题。Aliyun Log Log4j Appender 会将 appender 运行过程中产生的异常通过 `org.apache.log4j.helpers.LogLog` 记录下来，LogLog 在默认情况下会将信息输出到控制台。查看控制台是否包含 `Failed to putLogs.`。
 
 ## 常见问题
 
