@@ -33,6 +33,7 @@ public class LoghubAppender extends AppenderSkeleton {
         super.activateOptions();
         formatter = new SimpleDateFormat(timeFormat);
         formatter.setTimeZone(TimeZone.getTimeZone(timeZone));
+        config.userAgent = "log4j";
         producer = new LogProducer(config);
         producer.setProjectConfig(projectConfig);
 
