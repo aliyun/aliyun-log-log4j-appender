@@ -123,6 +123,9 @@ log4j.logger.org.apache.http=OFF
 log4j.logger.org.apache.http.wire=OFF
 log4j.logger.com.aliyun=OFF
 ```
+**Q**：用户可以自定义 `source` 字段的取值吗？
+
+**A**：目前不支持。`source` 字段会被设置成应用程序所在宿主机的 IP。
 
 ## 贡献者
 [@zzboy](https://github.com/zzboy) 对项目作了很大贡献。
