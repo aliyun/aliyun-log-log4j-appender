@@ -125,7 +125,7 @@ log4j.logger.com.aliyun=OFF
 ```
 **Q**：用户可以自定义 `source` 字段的取值吗？
 
-**A**：目前不支持。`source` 字段会被设置成应用程序所在宿主机的 IP。
+**A**：目前不支持。`source` 字段会被设置成应用程序所在宿主机的 IP。 log4j appender 会调用 aliyun log producer java 发送数据，在调用的时候会将 source 设置成了 null。aliyun log producer java 会调用 aliyun log java SDK 发送数据，同样会将 source = null 传递给 java SDK。但 aliyun log java SDK 发现 source 为 null 会将宿主机 IP 赋值给 source，这就是 source 字段之所以为宿主机 IP 的原因。
 
 ## 贡献者
 [@zzboy](https://github.com/zzboy) 对项目作了很大贡献。
