@@ -17,13 +17,17 @@ location: com.aliyun.openservices.log.log4j.example.Log4jAppenderExample.main(Lo
 message: error log
 thread: main
 time: 2018-01-02T03:15+0000
+__source__: xxx
+__topic__: yyy
 ```
 其中：
-+ level 是日志级别。
-+ location 是日志打印语句的代码位置。
-+ message 是日志内容。
-+ thread 是线程名称。
-+ time 是日志打印时间。
++ level 日志级别。
++ location 日志打印语句的代码位置。
++ message 日志内容。
++ thread 线程名称。
++ time 日志打印时间。
++ \_\_source\_\_ 日志来源，用户可在配置文件中指定。
++ \_\_topic\_\_ 日志主题，用户可在配置文件中指定。
 
 ## 功能优势
 + 日志不落盘：产生数据实时通过网络发给服务端。
@@ -49,7 +53,7 @@ time: 2018-01-02T03:15+0000
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log-log4j-appender</artifactId>
-    <version>0.1.7</version>
+    <version>0.1.8</version>
 </dependency>
 ```
 
@@ -86,6 +90,9 @@ log4j.appender.loghub.retryTimes=3
 
 #指定日志主题
 log4j.appender.loghub.topic = [your topic]
+
+#指定日志来源
+log4j.appender.loghub.source = [your source]
 
 #输出到日志服务的时间格式，使用 Java 中 SimpleDateFormat 格式化时间，默认是 ISO8601，可选参数
 log4j.appender.loghub.timeFormat=yyyy-MM-dd'T'HH:mmZ
@@ -125,7 +132,7 @@ log4j.logger.com.aliyun=OFF
 ```
 **Q**：用户可以自定义 `source` 字段的取值吗？
 
-**A**：目前不支持。`source` 字段会被设置成应用程序所在宿主机的 IP。 log4j appender 会调用 aliyun log producer java 发送数据，在调用的时候会将 source 设置成了 null。aliyun log producer java 会调用 aliyun log java SDK 发送数据，同样会将 source = null 传递给 java SDK。但 aliyun log java SDK 发现 source 为 null 会将宿主机 IP 赋值给 source，这就是 source 字段之所以为宿主机 IP 的原因。
+**A**：0.1.7 以及之前的版本不支持，在这些版本中 source 字段会被设置成应用程序所在宿主机的 IP。在最新的版本中，您可以参考上面的配置文件指定 source 的取值。
 
 **Q**：用户可以指定 `time` 字段的取值吗？
 
