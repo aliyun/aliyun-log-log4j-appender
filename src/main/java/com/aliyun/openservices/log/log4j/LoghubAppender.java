@@ -24,6 +24,7 @@ public class LoghubAppender extends AppenderSkeleton {
     private ProjectConfig projectConfig = new ProjectConfig();
     private String logstore;
     private String topic = "";
+    private String source = "";
     private String timeZone = "UTC";
     private String timeFormat = "yyyy-MM-dd'T'HH:mmZ";
     private SimpleDateFormat formatter;
@@ -91,6 +92,14 @@ public class LoghubAppender extends AppenderSkeleton {
         this.topic = topic;
     }
 
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
     public String getTimeZone() {
         return timeZone;
     }
@@ -128,8 +137,8 @@ public class LoghubAppender extends AppenderSkeleton {
                         .toString());
             }
         }
-        producer.send(projectConfig.projectName, logstore, topic, null, logItems,
-                new LoghubAppenderCallback(projectConfig.projectName, logstore, topic, null, logItems));
+        producer.send(projectConfig.projectName, logstore, topic, source, logItems,
+                new LoghubAppenderCallback(projectConfig.projectName, logstore, topic, source, logItems));
     }
 
     public String getProjectName() {
