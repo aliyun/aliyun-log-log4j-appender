@@ -124,9 +124,9 @@ log4j.appender.loghub.timeZone=UTC
 **Q**: 如何关闭某些类输出的日志？
 
 **A**: 通过在 log4j.properties 文件中添加 `log4j.logger.包名=OFF` 可屏蔽相应包下日志的输出。
-当您在 log4j.properties 文件中添加如下内容会屏蔽 package 名为 `com.aliyun.openservices.log.producer.inner` 下的日志输出。
+例如，当您在 log4j.properties 文件中添加如下内容会屏蔽 package 名为 `org.apache.http` 下所有类的日志输出。
 ```
-log4j.logger.com.aliyun.openservices.log.producer.inner=OFF
+log4j.logger.org.apache.http=OFF
 ```
 
 **Q**：用户可以自定义 `source` 字段的取值吗？
