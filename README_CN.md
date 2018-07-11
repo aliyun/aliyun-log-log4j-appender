@@ -129,6 +129,10 @@ log4j.appender.loghub.timeZone=UTC
 log4j.logger.org.apache.http=OFF
 ```
 
+**Q**: 在 log4j.properties 中设置了 `com.aliyun.openservices.log.producer.inner=OFF` 为何还能看到 `com.aliyun.openservices.log.producer.inner.IOThread` 输出的日志？
+
+**A**：该线程是在 log4j 完成初始化之前启动的，输出日志的那个时刻 log4j 框架还未完成 logging level 的设置。一旦 log4j 完成 logging level 的设置，IOThread 便不会输出日志。
+
 **Q**：用户可以自定义 `source` 字段的取值吗？
 
 **A**：0.1.7 以及之前的版本不支持，在这些版本中 source 字段会被设置成应用程序所在宿主机的 IP。在最新的版本中，您可以参考上面的配置文件指定 source 的取值。
