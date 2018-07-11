@@ -121,15 +121,14 @@ log4j.appender.loghub.timeZone=UTC
 * 通过观察控制台的输出来诊断您的问题。Aliyun Log Log4j Appender 会将 appender 运行过程中产生的异常通过 `org.apache.log4j.helpers.LogLog` 记录下来，LogLog 在默认情况下会将信息输出到控制台。查看控制台是否包含 `Failed to putLogs.`。
 
 ## 常见问题
+**Q**: 如何关闭某些类输出的日志？
 
-**Q**: 把日志级别设置成 DEBUG 之后，aliyun-log-log4j-appender 依赖的第三方库 apache httpclient 会输出大量的日志，如何把这部分日志关闭？
+**A**: 通过在 log4j.properties 文件中添加 `log4j.logger.包名=OFF` 可屏蔽相应包下日志的输出。
+当您在 log4j.properties 文件中添加如下内容会屏蔽 package 名为 `com.aliyun.openservices.log.producer.inner` 下的日志输出。
+```
+log4j.logger.com.aliyun.openservices.log.producer.inner=OFF
+```
 
-**A**: 可以在您的 log4j.properties 文件中添加如下内容
-```
-log4j.logger.org.apache.http=OFF
-log4j.logger.org.apache.http.wire=OFF
-log4j.logger.com.aliyun=OFF
-```
 **Q**：用户可以自定义 `source` 字段的取值吗？
 
 **A**：0.1.7 以及之前的版本不支持，在这些版本中 source 字段会被设置成应用程序所在宿主机的 IP。在最新的版本中，您可以参考上面的配置文件指定 source 的取值。
