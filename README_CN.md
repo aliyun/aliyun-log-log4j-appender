@@ -129,6 +129,10 @@ log4j.appender.loghub.timeZone=UTC
 log4j.logger.org.apache.http=OFF
 ```
 
+**Q**: 如何采集宿主机 IP？
+
+**A**: 不要在 log4j.properties 中设置 source 字段的值，这种情况下 source 字段会被设置成应用程序所在宿主机的 IP。
+
 **Q**: 在 log4j.properties 中设置了 `com.aliyun.openservices.log.producer.inner=OFF` 为何还能看到 `com.aliyun.openservices.log.producer.inner.IOThread` 输出的日志？
 
 **A**：该线程是在 log4j 完成初始化之前启动的，输出日志的那个时刻 log4j 框架还未完成 logging level 的设置。一旦 log4j 完成 logging level 的设置，IOThread 便不会输出日志。
