@@ -145,9 +145,9 @@ log4j.logger.org.apache.http=OFF
 
 **A**：用户无法指定 `time` 取值，appender 会以当前时间作为 `time` 的值。
 
-**Q**：在网络发生异常的情况下，appender 会如何处理待发送的日志？
+**Q**：在网络发生异常的情况下，`aliyun-log-log4j-appender` 会如何处理待发送的日志？
 
-**A**：appender 底层使用 `aliyun-log-producer-java` 发送数据，producer 会尝试发送数据 retryTimes 次，如果超过 retryTimes 次仍没有发送成功，会将错误信息输出，并丢弃该条日志。关于如何查看错误输出，可以参考错误诊断部分。
+**A**：`aliyun-log-log4j-appender` 底层使用 `aliyun-log-producer-java` 发送数据。producer 会根据您在配置文件中设置的 `retryTimes` 进行重试，如果超过 `retryTimes` 次数据仍没有发送成功，会将错误信息输出，并丢弃该条日志。关于如何查看错误输出，可以参考错误诊断部分。
 
 ## 贡献者
 [@zzboy](https://github.com/zzboy) 对项目作了很大贡献。
