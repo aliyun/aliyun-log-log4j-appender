@@ -1,12 +1,9 @@
 package com.aliyun.openservices.log.log4j;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.helpers.LogLog;
@@ -17,6 +14,10 @@ import com.aliyun.openservices.log.common.LogItem;
 import com.aliyun.openservices.log.producer.LogProducer;
 import com.aliyun.openservices.log.producer.ProducerConfig;
 import com.aliyun.openservices.log.producer.ProjectConfig;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public class LoghubAppender extends AppenderSkeleton {
     private ProducerConfig config = new ProducerConfig();
@@ -26,14 +27,13 @@ public class LoghubAppender extends AppenderSkeleton {
     private String topic = "";
     private String source = "";
     private String timeZone = "UTC";
-    private String timeFormat = "yyyy-MM-dd'T'HH:mmZ";
-    private SimpleDateFormat formatter;
+    private String timeFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
+    private DateTimeFormatter formatter;
 
     @Override
     public void activateOptions() {
         super.activateOptions();
-        formatter = new SimpleDateFormat(timeFormat);
-        formatter.setTimeZone(TimeZone.getTimeZone(timeZone));
+        formatter = DateTimeFormat.forPattern(timeFormat).withZone(DateTimeZone.forID(timeZone));
         config.userAgent = "log4j";
         producer = new LogProducer(config);
         producer.setProjectConfig(projectConfig);
@@ -55,8 +55,6 @@ public class LoghubAppender extends AppenderSkeleton {
 
     public void setTimeFormat(String timeFormat) {
         this.timeFormat = timeFormat;
-        formatter = new SimpleDateFormat(timeFormat);
-        formatter.setTimeZone(TimeZone.getTimeZone(timeZone));
     }
 
     public void close() {
@@ -106,8 +104,6 @@ public class LoghubAppender extends AppenderSkeleton {
 
     public void setTimeZone(String timeZone) {
         this.timeZone = timeZone;
-        formatter = new SimpleDateFormat(timeFormat);
-        formatter.setTimeZone(TimeZone.getTimeZone(timeZone));
     }
 
     @Override
@@ -116,7 +112,8 @@ public class LoghubAppender extends AppenderSkeleton {
         LogItem item = new LogItem();
         logItems.add(item);
         item.SetTime((int) (event.getTimeStamp() / 1000));
-        item.PushBack("time", formatter.format(new Date(event.getTimeStamp())));
+        DateTime dateTime = new DateTime(event.getTimeStamp());
+        item.PushBack("time", dateTime.toString(formatter));
         item.PushBack("level", event.getLevel().toString());
         item.PushBack("thread", event.getThreadName());
         item.PushBack("location", event.getLocationInformation().fullInfo);

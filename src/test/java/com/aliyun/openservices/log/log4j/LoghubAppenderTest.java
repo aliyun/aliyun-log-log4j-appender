@@ -1,15 +1,14 @@
 package com.aliyun.openservices.log.log4j;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by brucewu on 2018/1/5.
  */
 public class LoghubAppenderTest {
 
-    private static final Logger LOGGER = LogManager.getLogger(LoghubAppenderTest.class);
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(LoghubAppenderTest.class);
 
     @Test
     public void testLogCommonMessage() {
