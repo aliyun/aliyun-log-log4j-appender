@@ -9,13 +9,15 @@
 
 Apache log4j is an Apache Software Foundation Project. You can control the destination of the log through Log4j. It can be console, file, GUI components, socket, NT event log, syslog. You can control the output format for each log as well. You can control the generation process of the log through log level. The most interesting thing is you can complete the above things through a configuration file and without any code modification.
 
-You can set the destination of your log to AliCloud Log Service through `Aliyun Log Log4j Appender`. But it is important to note that `Aliyun Log Log4j Appender` doesn't support cofigure log's output format. The format of the log in AliCloud Log Service is as follows:
+You can set the destination of your log to AliCloud Log Service through `Aliyun Log Log4j Appender`. The format of the log in AliCloud Log Service is as follows:
 ```
 level: ERROR
 location: com.aliyun.openservices.log.log4j.example.Log4jAppenderExample.main(Log4jAppenderExample.java:16)
 message: error log
+throwable: java.lang.RuntimeException: xxx
 thread: main
 time: 2018-01-02T03:15+0000
+log: 0 [main] ERROR com.aliyun.openservices.log.log4j.example.Log4jAppenderExample - error log
 __source__: xxx
 __topic__: yyy
 ```
@@ -23,8 +25,10 @@ Field Specifications:
 + `level` stands for log level
 + `location` is logs's output position
 + `message` is the content of the log
++ `throwable` is exception of the log (this field will appear only if the exception is recorded)
 + `thread` stands for thread name
-+ `time` is the log's generation time
++ `time` is the log's generation time (you can configure it's format through timeFormat and timeZone)
++ `log` is custom log format
 + `__source__` is the log's source, you can specify its value in conf file
 + `__topic__` is the log's topic, you can specify its value in conf file
 
@@ -53,7 +57,7 @@ Field Specifications:
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log-log4j-appender</artifactId>
-    <version>0.1.9</version>
+    <version>0.1.10</version>
 </dependency>
 ```
 
@@ -75,6 +79,10 @@ log4j.appender.loghub.endpoint=[your project endpoint]
 log4j.appender.loghub.accessKeyId=[your accesskey id]
 log4j.appender.loghub.accessKey=[your accesskey]
 
+# Specify format of the field log, required
+log4j.appender.loghub.layout=org.apache.log4j.PatternLayout
+log4j.appender.loghub.layout.ConversionPattern=%-4r [%t] %-5p %c %x - %m%n
+
 # Specify the timeout for sending package, in milliseconds, default is 3000, the lower bound is 10, optional
 log4j.appender.loghub.packageTimeoutInMS=3000
 # Specify the maximum log count per package, the upper limit is 4096, optional
@@ -95,9 +103,11 @@ log4j.appender.loghub.topic = [your topic]
 # Specify the source of your log
 source = [your source]
 
-# Specify the time format of the data being sent to AliCloud Log Service, use SimpleDateFormat in Java to format time, default is ISO8601，optional
-log4j.appender.loghub.timeFormat=yyyy-MM-dd'T'HH:mmZ
-log4j.appender.loghub.timeZone=UTC
+# Specify time format of the field time, default is yyyy-MM-dd'T'HH:mm:ssZ, optional
+timeFormat = yyyy-MM-dd'T'HH:mm:ssZ
+
+# Specify timezone of the field time, default is UTC, optional
+timeZone = UTC
 ```
 
 ## Sample Code
