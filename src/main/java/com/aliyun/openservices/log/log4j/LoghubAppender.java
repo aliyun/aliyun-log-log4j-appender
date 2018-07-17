@@ -71,7 +71,7 @@ public class LoghubAppender extends AppenderSkeleton {
     }
 
     public boolean requiresLayout() {
-        return false;
+        return true;
     }
 
     public String getLogstore() {
@@ -117,14 +117,17 @@ public class LoghubAppender extends AppenderSkeleton {
         item.PushBack("level", event.getLevel().toString());
         item.PushBack("thread", event.getThreadName());
         item.PushBack("location", event.getLocationInformation().fullInfo);
-        String message = event.getMessage().toString();
-        ThrowableInformation throwable = event.getThrowableInformation();
+        item.PushBack("message", event.getMessage().toString());
+
+        String throwable = getThrowableStr(event);
         if (throwable != null) {
-            for (String s : throwable.getThrowableStrRep()) {
-                message += System.getProperty("line.separator") + s;
-            }
+            item.PushBack("throwable", throwable);
         }
-        item.PushBack("message", message);
+
+        if (getLayout() != null) {
+            item.PushBack("log", getLayout().format(event));
+        }
+
         Map properties = event.getProperties();
         if (properties.size() > 0) {
             Object[] keys = properties.keySet().toArray();
@@ -136,6 +139,24 @@ public class LoghubAppender extends AppenderSkeleton {
         }
         producer.send(projectConfig.projectName, logstore, topic, source, logItems,
                 new LoghubAppenderCallback(projectConfig.projectName, logstore, topic, source, logItems));
+    }
+
+    private String getThrowableStr(LoggingEvent event) {
+        ThrowableInformation throwable = event.getThrowableInformation();
+        if (throwable == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        boolean isFirst = true;
+        for (String s : throwable.getThrowableStrRep()) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sb.append(System.getProperty("line.separator"));
+            }
+            sb.append(s);
+        }
+        return sb.toString();
     }
 
     public String getProjectName() {

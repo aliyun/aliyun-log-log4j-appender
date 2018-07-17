@@ -1,6 +1,7 @@
 package com.aliyun.openservices.log.log4j;
 
 import org.junit.Test;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -8,7 +9,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LoghubAppenderTest {
 
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(LoghubAppenderTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoghubAppenderTest.class);
 
     @Test
     public void testLogCommonMessage() {
