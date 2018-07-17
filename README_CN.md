@@ -10,13 +10,15 @@ Log4j 是 Apache 的一个开放源代码项目，通过使用 Log4j，您可以
 
 Log4j 由三个重要的组件构成：日志信息的优先级，日志信息的输出目的地，日志信息的输出格式。日志信息的优先级从高到低分别为 ERROR、WARN、INFO和DEBUG，分别用来指定这条日志信息的重要程度；日志信息的输出目的地指定了日志将打印到控制台还是文件中；而输出格式则控制了日志信息的显示内容。
 
-通过Aliyun Log Log4j Appender，您可以控制日志的输出目的地为阿里云日志服务。需要注意的是，Aliyun Log Log4j Appender不支持设置日志的输出格式，写到日志服务中的日志的样式如下：
+通过Aliyun Log Log4j Appender，您可以控制日志的输出目的地为阿里云日志服务。写到日志服务中的日志的样式如下：
 ```
 level: ERROR
 location: com.aliyun.openservices.log.log4j.example.Log4jAppenderExample.main(Log4jAppenderExample.java:16)
 message: error log
+throwable: java.lang.RuntimeException: xxx
 thread: main
 time: 2018-01-02T03:15+0000
+log: 0 [main] ERROR com.aliyun.openservices.log.log4j.example.Log4jAppenderExample - error log
 __source__: xxx
 __topic__: yyy
 ```
@@ -24,8 +26,10 @@ __topic__: yyy
 + level 日志级别。
 + location 日志打印语句的代码位置。
 + message 日志内容。
++ throwable 日志异常信息（只有记录了异常信息，这个字段才会出现）。
 + thread 线程名称。
-+ time 日志打印时间。
++ time 日志打印时间（可以通过 timeFormat 或 timeZone 配置 time 字段呈现的格式和时区）。
++ log 自定义日志格式。
 + \_\_source\_\_ 日志来源，用户可在配置文件中指定。
 + \_\_topic\_\_ 日志主题，用户可在配置文件中指定。
 
@@ -53,7 +57,7 @@ __topic__: yyy
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log-log4j-appender</artifactId>
-    <version>0.1.9</version>
+    <version>0.1.10</version>
 </dependency>
 ```
 
@@ -75,6 +79,10 @@ log4j.appender.loghub.endpoint=[your project endpoint]
 log4j.appender.loghub.accessKeyId=[your accesskey id]
 log4j.appender.loghub.accessKey=[your accesskey]
 
+#设置 log 字段格式，必选参数
+log4j.appender.loghub.layout=org.apache.log4j.PatternLayout
+log4j.appender.loghub.layout.ConversionPattern=%-4r [%t] %-5p %c %x - %m%n
+
 #被缓存起来的日志的发送超时时间，如果缓存超时，则会被立即发送，单位是毫秒，默认值为3000，最小值为10，可选参数
 log4j.appender.loghub.packageTimeoutInMS=3000
 #每个缓存的日志包中包含日志数量的最大值，不能超过 4096，可选参数
@@ -88,14 +96,15 @@ log4j.appender.loghub.maxIOThreadSizeInPool=8
 #指定发送失败时重试的次数，如果超过该值，会把失败信息通过Log4j的LogLog进行记录，默认是3，可选参数
 log4j.appender.loghub.retryTimes=3
 
-#指定日志主题
+#指定日志主题，可选参数
 log4j.appender.loghub.topic = [your topic]
 
-#指定日志来源
+#指定日志来源，可选参数
 log4j.appender.loghub.source = [your source]
 
-#输出到日志服务的时间格式，使用 Java 中 SimpleDateFormat 格式化时间，默认是 ISO8601，可选参数
-log4j.appender.loghub.timeFormat=yyyy-MM-dd'T'HH:mmZ
+#设置时间格式，可选参数
+log4j.appender.loghub.timeFormat=yyyy-MM-dd'T'HH:mm:ssZ
+#设置时区，可选参数
 log4j.appender.loghub.timeZone=UTC
 ```
 参阅：https://github.com/aliyun/aliyun-log-producer-java
@@ -121,6 +130,19 @@ log4j.appender.loghub.timeZone=UTC
 * 通过观察控制台的输出来诊断您的问题。Aliyun Log Log4j Appender 会将 appender 运行过程中产生的异常通过 `org.apache.log4j.helpers.LogLog` 记录下来，LogLog 在默认情况下会将信息输出到控制台。查看控制台是否包含 `Failed to putLogs.`。
 
 ## 常见问题
+**Q**：是否支持自定义 log 格式？
+
+**A**：在 0.1.10 及以上版本新增了 log 字段。您可以通过配置 layout 来自定义 log 格式，例如：
+```
+#设置 log 字段格式，必选参数
+log4j.appender.loghub.layout=org.apache.log4j.PatternLayout
+log4j.appender.loghub.layout.ConversionPattern=%-4r [%t] %-5p %c %x - %m%n
+```
+log 输出样例：
+```
+log:  0 [main] ERROR com.aliyun.openservices.log.log4j.example.Log4jAppenderExample - error log
+```
+
 **Q**: 如何关闭某些类输出的日志？
 
 **A**: 通过在 log4j.properties 文件中添加 `log4j.logger.包名=OFF` 可屏蔽相应包下日志的输出。
