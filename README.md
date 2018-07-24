@@ -97,10 +97,10 @@ log4j.appender.loghub.maxIOThreadSizeInPool=8
 # Specify the retry times when failing to send data, if exceeds this value, the appender will record the failure message through it's LogLog, default is 3, optional
 log4j.appender.loghub.retryTimes=3
 
-# Specify the topic of your log
+# Specify the topic of your log, default is "", optional
 log4j.appender.loghub.topic = [your topic]
 
-# Specify the source of your log
+# Specify the source of your log, default is host ip, optional
 source = [your source]
 
 # Specify time format of the field time, default is yyyy-MM-dd'T'HH:mm:ssZ, optional
