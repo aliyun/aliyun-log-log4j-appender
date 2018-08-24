@@ -102,9 +102,9 @@ log4j.appender.loghub.topic = [your topic]
 #指的日志来源，默认为应用程序所在宿主机的 IP，可选参数
 log4j.appender.loghub.source = [your source]
 
-#设置时间格式，可选参数
+#设置时间格式，默认为 yyyy-MM-dd'T'HH:mm:ssZ，可选参数
 log4j.appender.loghub.timeFormat=yyyy-MM-dd'T'HH:mm:ssZ
-#设置时区，可选参数
+#设置时区，默认为 UTC，可选参数（如果希望 time 字段的时区为东八区，可将该值设定为 Asia/Shanghai）
 log4j.appender.loghub.timeZone=UTC
 ```
 参阅：https://github.com/aliyun/aliyun-log-producer-java
@@ -171,6 +171,10 @@ log4j.logger.org.apache.http=OFF
 **Q**：在网络发生异常的情况下，`aliyun-log-log4j-appender` 会如何处理待发送的日志？
 
 **A**：`aliyun-log-log4j-appender` 底层使用 `aliyun-log-producer-java` 发送数据。producer 会根据您在配置文件中设置的 `retryTimes` 进行重试，如果超过 `retryTimes` 次数据仍没有发送成功，会将错误信息输出，并丢弃该条日志。关于如何查看错误输出，可以参考错误诊断部分。
+
+**Q**：如果想设置 `time` 字段的时区为东八区或其他时区，该如何指定 `timeZone` 的取值？
+
+**A**：当您将 `timeZone` 指定为 `Asia/Shanghai` 时，`time` 字段的时区将为东八区。timeZone 字段可能的取值请参考 [java-util-timezone](http://tutorials.jenkov.com/java-date-time/java-util-timezone.html)。
 
 ## 贡献者
 [@zzboy](https://github.com/zzboy) 对项目作了很大贡献。
