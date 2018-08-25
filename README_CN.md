@@ -176,6 +176,12 @@ log4j.logger.org.apache.http=OFF
 
 **A**：当您将 `timeZone` 指定为 `Asia/Shanghai` 时，`time` 字段的时区将为东八区。timeZone 字段可能的取值请参考 [java-util-timezone](http://tutorials.jenkov.com/java-date-time/java-util-timezone.html)。
 
+**Q**：程序运行在函数服务的环境中为何无法记录日志或丢失少量日志？
+
+**A**： 原因：`aliyun-log-log4j-appender` 底层使用 [aliyun-log-producer-java](https://github.com/aliyun/aliyun-log-producer-java) 异步批量发送数据到日志服务，它会在 JVM 进程退出前依次调用 `producer` 的 `flush()` 方法和 `close()` 方法将缓存在内存中的数据写往日志服务。但函数服务结束时 JVM 进程并未退出导致上述方法没有被调用，因此出现了问题中的情况。
+
+解决方案：在您函数的最后一行添加代码 `Thread.sleep(2*packageTimeoutInMS)`，待 appender 将缓存的数据发送完成后再推出函数。（packageTimeoutInMS 为您在 log4j.properties 中配置的发送超时时间，默认值为 3000）
+
 ## 贡献者
 [@zzboy](https://github.com/zzboy) 对项目作了很大贡献。
 
