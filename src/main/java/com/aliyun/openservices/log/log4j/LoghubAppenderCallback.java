@@ -1,42 +1,46 @@
 package com.aliyun.openservices.log.log4j;
 
+import com.aliyun.openservices.aliyun.log.producer.Callback;
+import com.aliyun.openservices.aliyun.log.producer.Result;
 import com.aliyun.openservices.log.common.LogItem;
-import com.aliyun.openservices.log.exception.LogException;
-import com.aliyun.openservices.log.producer.ILogCallback;
-import com.aliyun.openservices.log.response.PutLogsResponse;
 import org.apache.log4j.helpers.LogLog;
-
-import java.util.List;
 
 /**
  * Created by brucewu on 2018/1/6.
  */
-public class LoghubAppenderCallback extends ILogCallback {
+public class LoghubAppenderCallback implements Callback {
 
-    private String project;
+  private String project;
 
-    private String logstore;
+  private String logStore;
 
-    private String topic;
+  private String topic;
 
-    private String source;
+  private String source;
 
-    private List<LogItem> logItems;
+  private LogItem logItem;
 
-    public LoghubAppenderCallback(String project, String logstore, String topic, String source, List<LogItem> logItems) {
-        super();
-        this.project = project;
-        this.logstore = logstore;
-        this.topic = topic;
-        this.source = source;
-        this.logItems = logItems;
+  public LoghubAppenderCallback(String project, String logStore, String topic, String source,
+      LogItem logItem) {
+    super();
+    this.project = project;
+    this.logStore = logStore;
+    this.topic = topic;
+    this.source = source;
+    this.logItem = logItem;
+  }
+
+  @Override
+  public void onCompletion(Result result) {
+    if (!result.isSuccessful()) {
+      LogLog.error(
+          "Failed to send log, project=" + project
+              + ", logStore=" + logStore
+              + ", topic=" + topic
+              + ", source=" + source
+              + ", logItem=" + logItem
+              + ", errorCode=" + result.getErrorCode()
+              + ", errorMessage=" + result.getErrorMessage());
     }
-
-    @Override
-    public void onCompletion(PutLogsResponse response, LogException e) {
-        if (e != null) {
-            LogLog.error("Failed to putLogs. project=" + project + " logstore=" + logstore + " topic=" + topic +
-                    " source=" + source + " logItems=" + logItems, e);
-        }
-    }
+  }
 }

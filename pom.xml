@@ -75,8 +75,13 @@
         </dependency>
         <dependency>
             <groupId>com.aliyun.openservices</groupId>
-            <artifactId>log-loghub-producer</artifactId>
-            <version>0.1.14</version>
+            <artifactId>aliyun-log-producer</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyun.openservices</groupId>
+            <artifactId>aliyun-log</artifactId>
+            <version>0.6.31</version>
         </dependency>
         <dependency>
             <groupId>joda-time</groupId>

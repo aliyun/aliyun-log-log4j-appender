@@ -1,8 +1,12 @@
 package com.aliyun.openservices.log.log4j;
 
-import java.util.ArrayList;
+import com.aliyun.openservices.aliyun.log.producer.LogProducer;
+import com.aliyun.openservices.aliyun.log.producer.Producer;
+import com.aliyun.openservices.aliyun.log.producer.ProducerConfig;
+import com.aliyun.openservices.aliyun.log.producer.ProjectConfig;
+import com.aliyun.openservices.aliyun.log.producer.ProjectConfigs;
+import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.AppenderSkeleton;
@@ -11,239 +15,302 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.spi.ThrowableInformation;
 
 import com.aliyun.openservices.log.common.LogItem;
-import com.aliyun.openservices.log.producer.LogProducer;
-import com.aliyun.openservices.log.producer.ProducerConfig;
-import com.aliyun.openservices.log.producer.ProjectConfig;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 public class LoghubAppender extends AppenderSkeleton {
-    private ProducerConfig config = new ProducerConfig();
-    private LogProducer producer;
-    private ProjectConfig projectConfig = new ProjectConfig();
-    private String logstore;
-    private String topic = "";
-    private String source = "";
-    private String timeZone = "UTC";
-    private String timeFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
-    private DateTimeFormatter formatter;
 
-    @Override
-    public void activateOptions() {
-        super.activateOptions();
-        formatter = DateTimeFormat.forPattern(timeFormat).withZone(DateTimeZone.forID(timeZone));
-        config.userAgent = "log4j";
-        producer = new LogProducer(config);
-        producer.setProjectConfig(projectConfig);
+  private String project;
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                try {
-                    doClose();
-                } catch (Exception e) {
-                    LogLog.error("Failed to close LoghubAppender.", e);
-                }
-            }
-        });
-    }
+  private String endpoint;
 
-    public String getTimeFormat() {
-        return timeFormat;
-    }
+  private String accessKeyId;
 
-    public void setTimeFormat(String timeFormat) {
-        this.timeFormat = timeFormat;
-    }
+  private String accessKeySecret;
 
-    public void close() {
+  private String userAgent = "log4j";
+
+  private String logStore;
+
+  private ProducerConfig producerConfig = new ProducerConfig(new ProjectConfigs());
+
+  private ProjectConfig projectConfig;
+
+  private String topic = "";
+
+  private String source = "";
+
+  private String timeFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
+
+  private String timeZone = "UTC";
+
+  private Producer producer;
+
+  private DateTimeFormatter formatter;
+
+  @Override
+  public void activateOptions() {
+    super.activateOptions();
+    formatter = DateTimeFormat.forPattern(timeFormat).withZone(DateTimeZone.forID(timeZone));
+    producer = createProducer();
+
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      public void run() {
         try {
-            doClose();
+          doClose();
         } catch (Exception e) {
-            LogLog.error("Failed to close LoghubAppender.", e);
+          LogLog.error("Failed to close LoghubAppender.", e);
         }
+      }
+    });
+  }
+
+  public void close() {
+    try {
+      doClose();
+    } catch (Exception e) {
+      LogLog.error("Failed to close LoghubAppender.", e);
+    }
+  }
+
+  private void doClose() throws InterruptedException, ProducerException {
+    producer.close();
+  }
+
+  public boolean requiresLayout() {
+    return true;
+  }
+
+  public Producer createProducer() {
+    projectConfig = buildProjectConfig();
+    producerConfig.getProjectConfigs().put(projectConfig);
+    return new LogProducer(producerConfig);
+  }
+
+  private ProjectConfig buildProjectConfig() {
+    return new ProjectConfig(project, endpoint, accessKeyId, accessKeySecret, null, userAgent);
+  }
+
+  @Override
+  protected void append(LoggingEvent event) {
+    LogItem logItem = new LogItem();
+    logItem.SetTime((int) (event.getTimeStamp() / 1000));
+    DateTime dateTime = new DateTime(event.getTimeStamp());
+    logItem.PushBack("time", dateTime.toString(formatter));
+    logItem.PushBack("level", event.getLevel().toString());
+    logItem.PushBack("thread", event.getThreadName());
+    logItem.PushBack("location", event.getLocationInformation().fullInfo);
+    logItem.PushBack("message", event.getMessage().toString());
+
+    String throwable = getThrowableStr(event);
+    if (throwable != null) {
+      logItem.PushBack("throwable", throwable);
     }
 
-    private void doClose() throws InterruptedException {
-        producer.flush();
-        producer.close();
+    if (getLayout() != null) {
+      logItem.PushBack("log", getLayout().format(event));
     }
 
-    public boolean requiresLayout() {
-        return true;
+    Map properties = event.getProperties();
+    if (properties.size() > 0) {
+      Object[] keys = properties.keySet().toArray();
+      Arrays.sort(keys);
+      for (int i = 0; i < keys.length; i++) {
+        logItem.PushBack(keys[i].toString(), properties.get(keys[i])
+            .toString());
+      }
     }
-
-    public String getLogstore() {
-        return logstore;
+    try {
+      producer.send(projectConfig.getProject(), logStore, topic, source, logItem,
+          new LoghubAppenderCallback(projectConfig.getProject(), logStore, topic, source, logItem));
+    } catch (Exception e) {
+      LogLog.error(
+          "Failed to send log, project=" + project
+              + ", logStore=" + logStore
+              + ", topic=" + topic
+              + ", source=" + source
+              + ", logItem=" + logItem, e);
     }
+  }
 
-    public void setLogstore(String logstore) {
-        this.logstore = logstore;
+  private String getThrowableStr(LoggingEvent event) {
+    ThrowableInformation throwable = event.getThrowableInformation();
+    if (throwable == null) {
+      return null;
     }
-
-    public String getTopic() {
-        return topic;
+    StringBuilder sb = new StringBuilder();
+    boolean isFirst = true;
+    for (String s : throwable.getThrowableStrRep()) {
+      if (isFirst) {
+        isFirst = false;
+      } else {
+        sb.append(System.getProperty("line.separator"));
+      }
+      sb.append(s);
     }
+    return sb.toString();
+  }
 
-    public void setTopic(String topic) {
-        this.topic = topic;
-    }
+  public String getProject() {
+    return project;
+  }
 
-    public String getSource() {
-        return source;
-    }
+  public void setProject(String project) {
+    this.project = project;
+  }
 
-    public void setSource(String source) {
-        this.source = source;
-    }
+  public String getEndpoint() {
+    return endpoint;
+  }
 
-    public String getTimeZone() {
-        return timeZone;
-    }
+  public void setEndpoint(String endpoint) {
+    this.endpoint = endpoint;
+  }
 
-    public void setTimeZone(String timeZone) {
-        this.timeZone = timeZone;
-    }
+  public String getAccessKeyId() {
+    return accessKeyId;
+  }
 
-    @Override
-    protected void append(LoggingEvent event) {
-        List<LogItem> logItems = new ArrayList<LogItem>();
-        LogItem item = new LogItem();
-        logItems.add(item);
-        item.SetTime((int) (event.getTimeStamp() / 1000));
-        DateTime dateTime = new DateTime(event.getTimeStamp());
-        item.PushBack("time", dateTime.toString(formatter));
-        item.PushBack("level", event.getLevel().toString());
-        item.PushBack("thread", event.getThreadName());
-        item.PushBack("location", event.getLocationInformation().fullInfo);
-        item.PushBack("message", event.getMessage().toString());
+  public void setAccessKeyId(String accessKeyId) {
+    this.accessKeyId = accessKeyId;
+  }
 
-        String throwable = getThrowableStr(event);
-        if (throwable != null) {
-            item.PushBack("throwable", throwable);
-        }
+  public String getAccessKeySecret() {
+    return accessKeySecret;
+  }
 
-        if (getLayout() != null) {
-            item.PushBack("log", getLayout().format(event));
-        }
+  public void setAccessKeySecret(String accessKeySecret) {
+    this.accessKeySecret = accessKeySecret;
+  }
 
-        Map properties = event.getProperties();
-        if (properties.size() > 0) {
-            Object[] keys = properties.keySet().toArray();
-            Arrays.sort(keys);
-            for (int i = 0; i < keys.length; i++) {
-                item.PushBack(keys[i].toString(), properties.get(keys[i])
-                        .toString());
-            }
-        }
-        producer.send(projectConfig.projectName, logstore, topic, source, logItems,
-                new LoghubAppenderCallback(projectConfig.projectName, logstore, topic, source, logItems));
-    }
+  public String getUserAgent() {
+    return userAgent;
+  }
 
-    private String getThrowableStr(LoggingEvent event) {
-        ThrowableInformation throwable = event.getThrowableInformation();
-        if (throwable == null) {
-            return null;
-        }
-        StringBuilder sb = new StringBuilder();
-        boolean isFirst = true;
-        for (String s : throwable.getThrowableStrRep()) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                sb.append(System.getProperty("line.separator"));
-            }
-            sb.append(s);
-        }
-        return sb.toString();
-    }
+  public void setUserAgent(String userAgent) {
+    this.userAgent = userAgent;
+  }
 
-    public String getProjectName() {
-        return projectConfig.projectName;
-    }
+  public String getLogStore() {
+    return logStore;
+  }
 
-    public void setProjectName(String projectName) {
-        projectConfig.projectName = projectName;
-    }
+  public void setLogStore(String logStore) {
+    this.logStore = logStore;
+  }
 
-    public String getEndpoint() {
-        return projectConfig.endpoint;
-    }
+  public int getTotalSizeInBytes() {
+    return producerConfig.getTotalSizeInBytes();
+  }
 
-    public void setEndpoint(String endpoint) {
-        projectConfig.endpoint = endpoint;
-    }
+  public void setTotalSizeInBytes(int totalSizeInBytes) {
+    producerConfig.setTotalSizeInBytes(totalSizeInBytes);
+  }
 
-    public String getAccessKeyId() {
-        return projectConfig.accessKeyId;
-    }
+  public long getMaxBlockMs() {
+    return producerConfig.getMaxBlockMs();
+  }
 
-    public void setAccessKeyId(String accessKeyId) {
-        projectConfig.accessKeyId = accessKeyId;
-    }
+  public void setMaxBlockMs(long maxBlockMs) {
+    producerConfig.setMaxBlockMs(maxBlockMs);
+  }
 
-    public String getAccessKey() {
-        return projectConfig.accessKey;
-    }
+  public int getIoThreadCount() {
+    return producerConfig.getIoThreadCount();
+  }
 
-    public void setAccessKey(String accessKey) {
-        projectConfig.accessKey = accessKey;
-    }
+  public void setIoThreadCount(int ioThreadCount) {
+    producerConfig.setIoThreadCount(ioThreadCount);
+  }
 
-    public String getStsToken() {
-        return projectConfig.stsToken;
-    }
+  public int getBatchSizeThresholdInBytes() {
+    return producerConfig.getBatchSizeThresholdInBytes();
+  }
 
-    public void setStsToken(String stsToken) {
-        projectConfig.stsToken = stsToken;
-    }
+  public void setBatchSizeThresholdInBytes(int batchSizeThresholdInBytes) {
+    producerConfig.setBatchSizeThresholdInBytes(batchSizeThresholdInBytes);
+  }
 
-    public int getPackageTimeoutInMS() {
-        return config.packageTimeoutInMS;
-    }
+  public int getBatchCountThreshold() {
+    return producerConfig.getBatchCountThreshold();
+  }
 
-    public void setPackageTimeoutInMS(int packageTimeoutInMS) {
-        config.packageTimeoutInMS = packageTimeoutInMS;
-    }
+  public void setBatchCountThreshold(int batchCountThreshold) {
+    producerConfig.setBatchCountThreshold(batchCountThreshold);
+  }
 
-    public int getLogsCountPerPackage() {
-        return config.logsCountPerPackage;
-    }
+  public int getLingerMs() {
+    return producerConfig.getLingerMs();
+  }
 
-    public void setLogsCountPerPackage(int logsCountPerPackage) {
-        config.logsCountPerPackage = logsCountPerPackage;
-    }
+  public void setLingerMs(int lingerMs) {
+    producerConfig.setLingerMs(lingerMs);
+  }
 
-    public int getLogsBytesPerPackage() {
-        return config.logsBytesPerPackage;
-    }
+  public int getRetries() {
+    return producerConfig.getRetries();
+  }
 
-    public void setLogsBytesPerPackage(int logsBytesPerPackage) {
-        config.logsBytesPerPackage = logsBytesPerPackage;
-    }
+  public void setRetries(int retries) {
+    producerConfig.setRetries(retries);
+  }
 
-    public int getMemPoolSizeInByte() {
-        return config.memPoolSizeInByte;
-    }
+  public int getMaxReservedAttempts() {
+    return producerConfig.getMaxReservedAttempts();
+  }
 
-    public void setMemPoolSizeInByte(int memPoolSizeInByte) {
-        config.memPoolSizeInByte = memPoolSizeInByte;
-    }
+  public void setMaxReservedAttempts(int maxReservedAttempts) {
+    producerConfig.setMaxReservedAttempts(maxReservedAttempts);
+  }
 
-    public int getMaxIOThreadSizeInPool() {
-        return config.maxIOThreadSizeInPool;
-    }
+  public long getBaseRetryBackoffMs() {
+    return producerConfig.getBaseRetryBackoffMs();
+  }
 
-    public void setMaxIOThreadSizeInPool(int maxIOThreadSizeInPool) {
-        config.maxIOThreadSizeInPool = maxIOThreadSizeInPool;
-    }
+  public void setBaseRetryBackoffMs(long baseRetryBackoffMs) {
+    producerConfig.setBaseRetryBackoffMs(baseRetryBackoffMs);
+  }
 
-    public int getRetryTimes() {
-        return config.retryTimes;
-    }
+  public long getMaxRetryBackoffMs() {
+    return producerConfig.getMaxRetryBackoffMs();
+  }
 
-    public void setRetryTimes(int retryTimes) {
-        config.retryTimes = retryTimes;
-    }
+  public void setMaxRetryBackoffMs(long maxRetryBackoffMs) {
+    producerConfig.setMaxRetryBackoffMs(maxRetryBackoffMs);
+  }
+
+  public String getTopic() {
+    return topic;
+  }
+
+  public void setTopic(String topic) {
+    this.topic = topic;
+  }
+
+  public String getSource() {
+    return source;
+  }
+
+  public void setSource(String source) {
+    this.source = source;
+  }
+
+  public String getTimeFormat() {
+    return timeFormat;
+  }
+
+  public void setTimeFormat(String timeFormat) {
+    this.timeFormat = timeFormat;
+  }
+
+  public String getTimeZone() {
+    return timeZone;
+  }
+
+  public void setTimeZone(String timeZone) {
+    this.timeZone = timeZone;
+  }
 }
