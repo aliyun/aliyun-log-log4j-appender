@@ -40,7 +40,7 @@ Field Specifications:
 
 
 ## Supported Version
-* log-loghub-producer 0.1.10
+* aliyun-log-producer 0.2.0
 * protobuf-java 2.5.0
 
 
@@ -57,7 +57,7 @@ Field Specifications:
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log-log4j-appender</artifactId>
-    <version>0.1.10</version>
+    <version>0.1.11</version>
 </dependency>
 ```
 
@@ -69,33 +69,38 @@ log4j.rootLogger=WARN,loghub
 
 log4j.appender.loghub=com.aliyun.openservices.log.log4j.LoghubAppender
 
-# Specify the project name of your log services, required
-log4j.appender.loghub.projectName=[your project]
-# Specify the logstore of your log services, required
-log4j.appender.loghub.logstore=[your logstore]
+# Specify the project of your log services, required
+log4j.appender.loghub.project=[your project]
+# Specify the logStore of your log services, required
+log4j.appender.loghub.logStore=[your logStore]
 # Specify the HTTP endpoint of your log services, required
 log4j.appender.loghub.endpoint=[your project endpoint]
 # Specify the account information for your log services, required
-log4j.appender.loghub.accessKeyId=[your accesskey id]
-log4j.appender.loghub.accessKey=[your accesskey]
+log4j.appender.loghub.accessKeyId=[your accessKeyId]
+log4j.appender.loghub.accessKeySecret=[your accessKeySecret]
 
 # Specify format of the field log, required
 log4j.appender.loghub.layout=org.apache.log4j.PatternLayout
 log4j.appender.loghub.layout.ConversionPattern=%-4r [%t] %-5p %c %x - %m%n
 
-# Specify the timeout for sending package, in milliseconds, default is 3000, the lower bound is 10, optional
-log4j.appender.loghub.packageTimeoutInMS=3000
-# Specify the maximum log count per package, the upper limit is 4096, optional
-log4j.appender.loghub.logsCountPerPackage=4096
-# Specify the maximum cache size per package, the upper limit is 3MB, in bytes, optional
-log4j.appender.loghub.logsBytesPerPackage=3145728
-# The upper limit of the memory that can be used by appender, in bytes, default is 100MB, optional
-log4j.appender.loghub.memPoolSizeInByte=1048576000
-# Specify the I/O thread pool's maximum pool size, the main function of the I/O thread pool is to send data, default is 8, optional
-maxIOThreadSizeInPool = 8
-log4j.appender.loghub.maxIOThreadSizeInPool=8
-# Specify the retry times when failing to send data, if exceeds this value, the appender will record the failure message through it's LogLog, default is 3, optional
-log4j.appender.loghub.retryTimes=3
+# The upper limit log size that a single producer instance can hold, default is 100MB.
+log4j.appender.loghub.totalSizeInBytes=104857600
+# If the producer has insufficient free space, the caller's maximum blocking time on the send method, defaults is 60 seconds.
+log4j.appender.loghub.maxBlockMs=60
+# The thread pool size for executing log sending tasks, defaults is the number of processors available.
+log4j.appender.loghub.ioThreadCount=8
+# When the size of the cached log in a Producer Batch is greater than or equal batchSizeThresholdInBytes, the batch will be send, default is 512KB, maximum can be set to 5MB.
+log4j.appender.loghub.batchSizeThresholdInBytes=524288
+# When the number of log entries cached in a ProducerBatch is greater than or equal to batchCountThreshold, the batch will be send.
+log4j.appender.loghub.batchCountThreshold=4096
+# A ProducerBatch has a residence time from creation to sending, defaulting is 2 seconds and a minimum of 100 milliseconds.
+log4j.appender.loghub.lingerMs=2000
+# The number of times a Producer Batch can be retried if it fails to send for the first time, default is 10.
+log4j.appender.loghub.retries=10
+# The backoff time for the first retry, default 100 milliseconds.
+log4j.appender.loghub.baseRetryBackoffMs=100
+# The maximum backoff time for retries, default is 50 seconds.
+log4j.appender.loghub.maxRetryBackoffMs=100
 
 # Specify the topic of your log, default is "", optional
 log4j.appender.loghub.topic = [your topic]

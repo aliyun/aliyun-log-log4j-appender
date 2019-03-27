@@ -40,7 +40,7 @@ __topic__: yyy
 + 上下文查询：服务端除了通过关键词检索外，给定日志能够精确还原原始日志文件上下文日志信息。
 
 ## 版本支持
-* log-loghub-producer 0.1.10
+* aliyun-log-producer 0.2.0
 * protobuf-java 2.5.0
 
 
@@ -57,7 +57,7 @@ __topic__: yyy
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log-log4j-appender</artifactId>
-    <version>0.1.10</version>
+    <version>0.1.11</version>
 </dependency>
 ```
 
@@ -70,31 +70,41 @@ log4j.rootLogger=WARN,loghub
 log4j.appender.loghub=com.aliyun.openservices.log.log4j.LoghubAppender
 
 #日志服务的project名，必选参数
-log4j.appender.loghub.projectName=[your project]
+log4j.appender.loghub.project=[your project]
 #日志服务的logstore名，必选参数
-log4j.appender.loghub.logstore=[your logstore]
+log4j.appender.loghub.logStore=[your logStore]
 #日志服务的http地址，必选参数
 log4j.appender.loghub.endpoint=[your project endpoint]
 #用户身份标识，必选参数
 log4j.appender.loghub.accessKeyId=[your accesskey id]
-log4j.appender.loghub.accessKey=[your accesskey]
+log4j.appender.loghub.accessKeySecret=[your accessKeySecret]
 
 #设置 log 字段格式，必选参数
 log4j.appender.loghub.layout=org.apache.log4j.PatternLayout
 log4j.appender.loghub.layout.ConversionPattern=%-4r [%t] %-5p %c %x - %m%n
 
-#被缓存起来的日志的发送超时时间，如果缓存超时，则会被立即发送，单位是毫秒，默认值为3000，最小值为10，可选参数
-log4j.appender.loghub.packageTimeoutInMS=3000
-#每个缓存的日志包中包含日志数量的最大值，不能超过 4096，可选参数
-log4j.appender.loghub.logsCountPerPackage=4096
-#每个缓存的日志包的大小的上限，不能超过 3MB，单位是字节，可选参数
-log4j.appender.loghub.logsBytesPerPackage=3145728
-#Appender 实例可以使用的内存的上限，单位是字节，默认是 100MB，可选参数
-log4j.appender.loghub.memPoolSizeInByte=1048576000
-#指定I/O线程池最大线程数量，主要用于发送数据到日志服务，默认是8，可选参数
-log4j.appender.loghub.maxIOThreadSizeInPool=8
-#指定发送失败时重试的次数，如果超过该值，会把失败信息通过Log4j的LogLog进行记录，默认是3，可选参数
-log4j.appender.loghub.retryTimes=3
+#单个 producer 实例能缓存的日志大小上限，默认为 100MB。
+log4j.appender.loghub.totalSizeInBytes=104857600
+#如果 producer 可用空间不足，调用者在 send 方法上的最大阻塞时间，默认为 60 秒。
+log4j.appender.loghub.maxBlockMs=60
+#执行日志发送任务的线程池大小，默认为可用处理器个数。
+log4j.appender.loghub.ioThreadCount=8
+#当一个 ProducerBatch 中缓存的日志大小大于等于 batchSizeThresholdInBytes 时，该 batch 将被发送，默认为 512 KB，最大可设置成 5MB。
+log4j.appender.loghub.batchSizeThresholdInBytes=524288
+#当一个 ProducerBatch 中缓存的日志条数大于等于 batchCountThreshold 时，该 batch 将被发送，默认为 4096，最大可设置成 40960。
+log4j.appender.loghub.batchCountThreshold=4096
+#一个 ProducerBatch 从创建到可发送的逗留时间，默认为 2 秒，最小可设置成 100 毫秒。
+log4j.appender.loghub.lingerMs=2000
+#如果某个 ProducerBatch 首次发送失败，能够对其重试的次数，默认为 10 次。
+#如果 retries 小于等于 0，该 ProducerBatch 首次发送失败后将直接进入失败队列。
+log4j.appender.loghub.retries=10
+#该参数越大能让您追溯更多的信息，但同时也会消耗更多的内存。
+log4j.appender.loghub.maxReservedAttempts=11
+#首次重试的退避时间，默认为 100 毫秒。
+#Producer 采样指数退避算法，第 N 次重试的计划等待时间为 baseRetryBackoffMs * 2^(N-1)。
+log4j.appender.loghub.baseRetryBackoffMs=100
+#重试的最大退避时间，默认为 50 秒。
+log4j.appender.loghub.maxRetryBackoffMs=100
 
 #指定日志主题，默认为 ""，可选参数
 log4j.appender.loghub.topic = [your topic]
@@ -115,8 +125,8 @@ log4j.appender.loghub.timeZone=UTC
 
 **log4j.properties样例说明**
 + 配置了三个appender：loghubAppender1、loghubAppender2、STDOUT。
-+ loghubAppender1：将日志输出到project=test-proj，logstore=store1。输出WARN及以上级别的日志。
-+ loghubAppender2：将日志输出到project=test-proj，logstore=store2。输出INFO及以上级别的日志。
++ loghubAppender1：将日志输出到project=test-proj，logStore=store1。输出WARN及以上级别的日志。
++ loghubAppender2：将日志输出到project=test-proj，logStore=store2。输出INFO及以上级别的日志。
 + STDOUT：将日志输出到控制台。由于没有对日志级别进行过滤，会输出rootLogger中配置的日志级及以上的所有日志。
 
 [Log4jAppenderExample.java](/src/main/java/com/aliyun/openservices/log/log4j/example/Log4jAppenderExample.java)
@@ -156,10 +166,6 @@ log4j.logger.org.apache.http=OFF
 
 **A**: 不要在 log4j.properties 中设置 source 字段的值，这种情况下 source 字段会被设置成应用程序所在宿主机的 IP。
 
-**Q**: 在 log4j.properties 中设置了 `com.aliyun.openservices.log.producer.inner=OFF` 为何还能看到 `com.aliyun.openservices.log.producer.inner.IOThread` 输出的日志？
-
-**A**：该线程是在 log4j 完成初始化之前启动的，输出日志的那个时刻 log4j 框架还未完成 logging level 的设置。一旦 log4j 完成 logging level 的设置，IOThread 便不会输出日志。
-
 **Q**：用户可以自定义 `source` 字段的取值吗？
 
 **A**：0.1.7 以及之前的版本不支持，在这些版本中 source 字段会被设置成应用程序所在宿主机的 IP。在最新的版本中，您可以参考上面的配置文件指定 source 的取值。
@@ -175,12 +181,6 @@ log4j.logger.org.apache.http=OFF
 **Q**：如果想设置 `time` 字段的时区为东八区或其他时区，该如何指定 `timeZone` 的取值？
 
 **A**：当您将 `timeZone` 指定为 `Asia/Shanghai` 时，`time` 字段的时区将为东八区。timeZone 字段可能的取值请参考 [java-util-timezone](http://tutorials.jenkov.com/java-date-time/java-util-timezone.html)。
-
-**Q**：程序运行在函数服务的环境中为何无法记录日志或丢失少量日志？
-
-**A**： 原因：`aliyun-log-log4j-appender` 底层使用 [aliyun-log-producer-java](https://github.com/aliyun/aliyun-log-producer-java) 异步批量发送数据到日志服务，它会在 JVM 进程退出前依次调用 `producer` 的 `flush()` 方法和 `close()` 方法将缓存在内存中的数据写往日志服务。但函数服务结束时 JVM 进程并未退出导致上述方法没有被调用，因此出现了问题中的情况。
-
-解决方案：在您函数的最后一行添加代码 `Thread.sleep(2*packageTimeoutInMS)`，待 appender 将缓存的数据发送完成后再推出函数。（packageTimeoutInMS 为您在 log4j.properties 中配置的发送超时时间，默认值为 3000）
 
 ## 贡献者
 [@zzboy](https://github.com/zzboy) 对项目作了很大贡献。
