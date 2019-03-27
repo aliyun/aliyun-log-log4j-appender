@@ -2,7 +2,7 @@ language: java
 jdk:
 - oraclejdk8
 install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true
-script: mvn test
+script: mvn -Dendpoint=${endpoint} -DaccessKeyId=${accessKeyId} -DaccessKeySecret=${accessKeySecret} -Dproject=${project} -DlogStore=${logStore} clean test
 env:
   global:
   - secure: E3SSbE2pdZYaLcjGpXpXPY1dhtvHv97PQyMOozYCi6QA5v3lJcpiTWozfeXajE5IZ4fwYdE7ot88yfrdjj7mOs/BGroygEu6dcJS+JFOcxFCi24np4xpOyP94P66JeP9JE87BQliFwvTkc7A3Obj4fhr+E+6to650V0hike9Fzkruoy6tMMciNkZ8AYRuzXrW4Rd4FlX2ULYwVc5FSykt+P6svz3XYfEn7XHjcZp1uBGS3GWpbgGLJI2xoVDHjQbnwvpGC6FXiWUG0Rz1hYwOjldCaVqVaIKJt8KD6mtmbetGnJRoh2YVqxKTrADQUe3dW/Yp/+wtHsWDjqmZh8KkoQSvREY+X7iYHzkFI4kR0Kc4Gb8annKbhPQlhRf3xXivswIzR+TXC5RFxOo2AMDBTG4jduW4EVLCPOvYbKMldbqCeOign2swYVKmqXRHFFbCIOXccODjeByMTyasEVBRvKpSONQA3LQPR3zUPWW3gRTAa88D5wJURj9kKqY3hb80yxMLG4otvvtyb/8cVVolE960pdK5VdP/a+RwBBjkwxeariUIRQde4PbeCZrMCINu5HI2sZ6Bbbu0qKyZdMO9PThRRyZrpvqw1FDRbUzKX1oTzjVCZDYi7eW0ebj6Hkr5dMCyd4My09u3BYzM02tsqkrv4nYr068mda/ehJtvRA=
