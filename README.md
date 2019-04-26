@@ -86,7 +86,7 @@ log4j.appender.loghub.layout.ConversionPattern=%-4r [%t] %-5p %c %x - %m%n
 # The upper limit log size that a single producer instance can hold, default is 100MB.
 log4j.appender.loghub.totalSizeInBytes=104857600
 # If the producer has insufficient free space, the caller's maximum blocking time on the send method, defaults is 60 seconds.
-log4j.appender.loghub.maxBlockMs=60
+log4j.appender.loghub.maxBlockMs=60000
 # The thread pool size for executing log sending tasks, defaults is the number of processors available.
 log4j.appender.loghub.ioThreadCount=8
 # When the size of the cached log in a Producer Batch is greater than or equal batchSizeThresholdInBytes, the batch will be send, default is 512KB, maximum can be set to 5MB.
