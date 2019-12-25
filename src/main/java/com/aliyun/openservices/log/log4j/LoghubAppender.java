@@ -103,7 +103,7 @@ public class LoghubAppender extends AppenderSkeleton {
     logItem.PushBack("level", event.getLevel().toString());
     logItem.PushBack("thread", event.getThreadName());
     logItem.PushBack("location", event.getLocationInformation().fullInfo);
-    logItem.PushBack("message", event.getMessage().toString());
+    logItem.PushBack("message", String.valueOf(event.getMessage()));
 
     String throwable = getThrowableStr(event);
     if (throwable != null) {
