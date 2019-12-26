@@ -1,6 +1,6 @@
 language: java
 jdk:
-- oraclejdk8
+- oraclejdk9
 install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true
 script: mvn -Dendpoint=${ENDPOINT} -DaccessKeyId=${ACCESS_KEY_ID} -DaccessKeySecret=${ACCESS_KEY_SECRET}
   -Dproject=${PROJECT} -DlogStore=${LOG_STORE} clean test
