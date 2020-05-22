@@ -4,7 +4,6 @@ import com.aliyun.openservices.aliyun.log.producer.LogProducer;
 import com.aliyun.openservices.aliyun.log.producer.Producer;
 import com.aliyun.openservices.aliyun.log.producer.ProducerConfig;
 import com.aliyun.openservices.aliyun.log.producer.ProjectConfig;
-import com.aliyun.openservices.aliyun.log.producer.ProjectConfigs;
 import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import java.util.Arrays;
 import java.util.Map;
@@ -35,7 +34,7 @@ public class LoghubAppender extends AppenderSkeleton {
 
   private String logStore;
 
-  private ProducerConfig producerConfig = new ProducerConfig(new ProjectConfigs());
+  private ProducerConfig producerConfig = new ProducerConfig();
 
   private ProjectConfig projectConfig;
 
@@ -58,6 +57,7 @@ public class LoghubAppender extends AppenderSkeleton {
     producer = createProducer();
 
     Runtime.getRuntime().addShutdownHook(new Thread() {
+      @Override
       public void run() {
         try {
           doClose();
@@ -68,6 +68,7 @@ public class LoghubAppender extends AppenderSkeleton {
     });
   }
 
+  @Override
   public void close() {
     try {
       doClose();
@@ -80,14 +81,16 @@ public class LoghubAppender extends AppenderSkeleton {
     producer.close();
   }
 
+  @Override
   public boolean requiresLayout() {
     return true;
   }
 
   public Producer createProducer() {
     projectConfig = buildProjectConfig();
-    producerConfig.getProjectConfigs().put(projectConfig);
-    return new LogProducer(producerConfig);
+    Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(projectConfig);
+    return producer;
   }
 
   private ProjectConfig buildProjectConfig() {
