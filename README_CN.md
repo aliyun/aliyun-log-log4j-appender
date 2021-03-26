@@ -85,8 +85,8 @@ log4j.appender.loghub.layout.ConversionPattern=%-4r [%t] %-5p %c %x - %m%n
 
 #单个 producer 实例能缓存的日志大小上限，默认为 100MB。
 log4j.appender.loghub.totalSizeInBytes=104857600
-#如果 producer 可用空间不足，调用者在 send 方法上的最大阻塞时间，默认为 60 秒。
-log4j.appender.loghub.maxBlockMs=60000
+#如果 producer 可用空间不足，调用者在 send 方法上的最大阻塞时间，默认为 60 秒。为了不阻塞打印日志的线程，强烈建议将该值设置成 0。
+log4j.appender.loghub.maxBlockMs=0
 #执行日志发送任务的线程池大小，默认为可用处理器个数。
 log4j.appender.loghub.ioThreadCount=8
 #当一个 ProducerBatch 中缓存的日志大小大于等于 batchSizeThresholdInBytes 时，该 batch 将被发送，默认为 512 KB，最大可设置成 5MB。
@@ -104,7 +104,7 @@ log4j.appender.loghub.maxReservedAttempts=11
 #Producer 采样指数退避算法，第 N 次重试的计划等待时间为 baseRetryBackoffMs * 2^(N-1)。
 log4j.appender.loghub.baseRetryBackoffMs=100
 #重试的最大退避时间，默认为 50 秒。
-log4j.appender.loghub.maxRetryBackoffMs=100
+log4j.appender.loghub.maxRetryBackoffMs=50000
 
 #指定日志主题，默认为 ""，可选参数
 log4j.appender.loghub.topic = [your topic]
