@@ -182,7 +182,7 @@ log4j.logger.org.apache.http=OFF
 
 **A**：当您将 `timeZone` 指定为 `Asia/Shanghai` 时，`time` 字段的时区将为东八区。timeZone 字段可能的取值请参考 [java-util-timezone](http://tutorials.jenkov.com/java-date-time/java-util-timezone.html)。
 
-**Q**：为什么程序在运行时会抛出` java.lang.InterruptedException`？
+**Q**：为什么程序在运行时会抛出`java.lang.InterruptedException`？
 
 **A**：aliyun-log-log4j-appender 会调用 [Producer.send()](https://github.com/aliyun/aliyun-log-java-producer/blob/master/src/main/java/com/aliyun/openservices/aliyun/log/producer/Producer.java#L16) 方法发送数据。执行 send() 方法的线程如果被中断了，如调用了 Thread.interrupted() 方法，就会抛出这样的异常。
 调用  [Producer.send()](https://github.com/aliyun/aliyun-log-java-producer/blob/master/src/main/java/com/aliyun/openservices/aliyun/log/producer/Producer.java#L16) 方法所属的线程和您调用 LOGGER.info() 打印日志的线程是相同的线程，请检查您的程序在何时会调用 Thread.interrupted()  方法。
