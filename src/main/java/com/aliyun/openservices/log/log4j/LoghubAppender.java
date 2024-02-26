@@ -304,6 +304,7 @@ public class LoghubAppender extends AppenderSkeleton {
 
   public void setSource(String source) {
     this.source = source;
+    this.producerConfig.setSourceIp(source);
   }
 
   public String getTimeFormat() {
