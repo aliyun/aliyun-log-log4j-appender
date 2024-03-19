@@ -106,13 +106,13 @@ log4j.appender.loghub.maxRetryBackoffMs=50000
 log4j.appender.loghub.topic = [your topic]
 
 # Specify the source of your log, default is host ip, optional
-source = [your source]
+log4j.appender.loghub.source = [your source]
 
 # Specify time format of the field time, default is yyyy-MM-dd'T'HH:mm:ssZ, optional
-timeFormat = yyyy-MM-dd'T'HH:mm:ssZ
+log4j.appender.loghub.timeFormat = yyyy-MM-dd'T'HH:mm:ssZ
 
 # Specify timezone of the field time, default is UTC, optional
-timeZone = UTC
+log4j.appender.loghub.timeZone = UTC
 ```
 
 ## Sample Code
